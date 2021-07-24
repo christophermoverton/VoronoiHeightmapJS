@@ -256,10 +256,10 @@ function storePolyPts(polyobj, polyverts, pt){
     // let range7 = .015715;
     // let range8 = .07815;
     // let range9 = .915;
-    let range = [.00002,.00003,.00004,.000125,.00025,.000315,.000415,.000515,.000615,.000715,.000815,
+    let range = [0.0,.00002,.00003,.00004,.000125,.00025,.000315,.000415,.000515,.000615,.000715,.000815,
                   .000915,.00115,.00125,.00135,.00145,.00155,.00165,.00175,.00185,
                   .00195,.00215,.003,.004,.005,.006,.007,.008,.009,.01,.02,.03,.04,
-                  .05,.06,.07,.08,.09,.1,.2,.3,.4,.5,.6,.7,.8,.9];  //45
+                  .05,.06,.07,.08,.09,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0];  //45
     let lrpvals = [.1,.14,.134,.145,.356,.367,.3675,.4672,.4678,.56783,.56782,.568,.566,.5625,.5615,.56775,.5675,.5673,.5672,
                   .5671, .67, .585,.575,.565,.555,.545,.535,.525,.515,.55,.6495,.6485,.6475,
                   .6465,.6455,.6445,.6435,.525,.515,.505,.495,.485,.475,.465,.455,.435,.425,
@@ -267,29 +267,43 @@ function storePolyPts(polyobj, polyverts, pt){
     var r1 = 0;
     var r2 = 0;
     var l1 = .015;
-    var l2 = lrpvals[0];
+    var l2 = 0;
     if (aval > 1){
         console.log('aval: ');
         console.log(aval);
     }
-    for (var i = 0; i < range.length+1; i++){
+    // let results = rktree.nearest({x:aval},2);
+    // //console.log(results);
+    // r1 = min([results[0].x, results[1].x]);
+    // r2 = max([results[0].x, results[1].x]);
+    // l1 = rangeHeightsMap[r1];
+    // l2 = rangeHeightsMap[r2];
+    
+    // console.log(l1);
+    // console.log(l2);
+    // console.log(t);
+    // console.log(results);
+    // return lerp(l1,l2,t);
+    for (var i = 0; i < range.length; i++){
         if (i > 0){
             r1 = range[i-1];
             r2 = range[i];
             l1 = lrpvals[i-1];
             l2 = lrpvals[i];
         }
-        else if (i == range.length){
-            r1 = range[i-1];
-            r2 = 1;
-            l1 = lrpvals[i-1];
-            l2 = lrpvals[i];
-        }
+        // else if (i == range.length){
+        //     // r1 = range[i-1];
+        //     // r2 = 1;
+        //     // l1 = lrpvals[i-1];
+        //     // l2 = lrpvals[i];
+        // }
         if (aval >= r1 && aval <= r2){
-            return lerp(l1,l2,aval);
+            let t = (aval-r1)/(r2-r1);
+            return lerp(l1,l2,t);
         }
     }
     // if (aval >= range1 && aval <= range2){
+        
     //   return lerp(.65, .95, aval);
     // }    
     // else if (aval > range2 && aval <= range3){
@@ -611,12 +625,33 @@ function storePolyPts(polyobj, polyverts, pt){
   var vertexObj;
   var completedPoints;
   var randomP;
+  //var rangeHeightsMap;
+  //var rktree;
   
   function setup() { 
     createCanvas(750, 500);
     background(0);
     randomP = random()*100000;
     completedPoints = {};
+    rangeHeightsMap = {};
+    rangetreearr = [];
+    var distance = function(a, b){
+        return Math.pow(a.x - b.x, 2) +  Math.pow(a.y - b.y, 2);
+      }
+    // let range = [0.0,.00002,.00003,.00004,.000125,.00025,.000315,.000415,.000515,.000615,.000715,.000815,
+    //     .000915,.00115,.00125,.00135,.00145,.00155,.00165,.00175,.00185,
+    //     .00195,.00215,.003,.004,.005,.006,.007,.008,.009,.01,.02,.03,.04,
+    //     .05,.06,.07,.08,.09,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0];  //45
+    // let lrpvals = [.1,.1,.14,.134,.145,.356,.367,.3675,.4672,.4678,.56783,.56782,.568,.566,.5625,.5615,
+    //     .56775,.5675,.5673,.5672,
+    //     .5671, .67, .585,.575,.565,.555,.545,.535,.525,.515,.55,.6495,.6485,.6475,
+    //     .6465,.6455,.6445,.6435,.525,.515,.505,.495,.485,.475,.465,.455,.435,.425,
+    //     .415,.405,.395,.385,.375,.365,.355,.345,.335,.4,.5,.5,.5,.5];  //15
+    // for (var i = 0; i < range.length; i++){
+    //     rangeHeightsMap[range[i]] = lrpvals[i];
+    //     rangetreearr.push({x:range[i]});
+    // }
+    // rktree = new kdTree(rangetreearr, distance,["x"]);
     ///*
     let snum = 20000;
     let siteseedsnum = random(.5,1)*700;
@@ -624,9 +659,7 @@ function storePolyPts(polyobj, polyverts, pt){
     var sitesobj = {};
     let startNode = {x:random(0,.1)*750, y: random(.4,.5)*500};
     let endNode = {x: 750, y: random(.4,.5)*500};
-    var distance = function(a, b){
-      return Math.pow(a.x - b.x, 2) +  Math.pow(a.y - b.y, 2);
-    }
+
     kdt = new kdTree([startNode],distance,["x","y"]);
     //let branchDir = endNode.copy().sub(startNode.copy())
     let wnodes = monteCarloPick(startNode,endNode);
